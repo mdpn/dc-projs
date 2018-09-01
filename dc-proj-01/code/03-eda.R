@@ -21,16 +21,16 @@ write_csv(isu_bas, "data/breath_alcohol_ames.csv")
 
 # 1 Highest average recorded by ISU PD? 
 
-duis %>% 
-  filter(Location == "ISU PD") %>% 
+isu_bas %>% 
+  filter(location == "ISU PD") %>% 
   mutate(meanRes = (Res1 + Res2)/2) %>% 
   arrange(desc(meanRes))
 
 # 2 scatterplot of Res1 v Res 2, colored by gender, facet location. Check for outliers, inconsistencies
 
-ggplot(data = duis) + 
-  geom_point(aes(x = Res1, y = Res2, color = Gender)) + 
-  facet_wrap(~Location)
+ggplot(data = isu_bas) + 
+  geom_point(aes(x = Res1, y = Res2, color = gender)) + 
+  facet_wrap(~location)
 
 # 3a total number of dui readings by year 
 
@@ -55,13 +55,14 @@ ggplot(aes(x = gender, y = meanRes)) +
 
 ## https://www.desmoinesregister.com/story/news/2015/08/04/uber-launch-ames-iowa/31110437/
 
-duis %>% filter(Location %in% c("Ames PD", "ISU PD")) %>% group_by(year = year(Date), month = month(Date)) %>% count %>% ungroup() -> monthly_duis
+isu_bas %>% filter(location %in% c("Ames PD", "ISU PD")) %>% group_by(year, month) %>% count %>% ungroup() -> monthly_duis
 monthly_duis %>% mutate(mdt = ymd(paste(year, month, "01", sep = "-"))) -> monthly_duis
 ggplot(data = monthly_duis, aes(x = mdt, y = n)) + 
   geom_line() +
   geom_vline(xintercept = ymd("2015-08-04"), color = 'forestgreen') + 
   geom_vline(xintercept = ymd("2014-04-08"), color = "red") + 
   geom_smooth() + 
+  scale_x_date(breaks = ) + 
   labs(x = "Date", y = "Number of Breath Alcohol Tests (by month)", 
        title = "Breath Alcohol Tests by ISU and Ames Police, 2013-2017", 
        subtitle = "red line = Veisha riot 2014, green line = Uber arrives in Ames")
